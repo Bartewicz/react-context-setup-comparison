@@ -12,7 +12,7 @@ import {
 import './App.css'
 
 const planets = [
-  'World',
+  'Earth',
   'Mercury',
   'Venus',
   'Mars',
@@ -23,7 +23,7 @@ const planets = [
 ]
 function noop() {}
 
-function useInitialState() {
+function useChangingState() {
   const [planet, setPlanet] = useState(planets[0])
   const changePlanet = useCallback(() => {
     const randomIdx = Math.floor(Math.random() * planets.length)
@@ -35,7 +35,7 @@ function useInitialState() {
 const AppContext = createContext({ planet: '', changePlanet: noop })
 
 function AppContextProvider({ children }) {
-  const state = useInitialState()
+  const state = useChangingState()
   return <AppContext.Provider value={state}>{children}</AppContext.Provider>
 }
 
@@ -53,15 +53,56 @@ function ContextConsumerButton() {
   return <Button onClick={changePlanet}>Shuffle!</Button>
 }
 
-function ContextAgnosticParagraph({ children }) {
+function ContextAgnosticCard({ children }) {
+  return (
+    <Card css={{ $$cardColor: '#111', p: '0 $sm', m: '$md 0' }}>
+      <Card.Body>{children}</Card.Body>
+    </Card>
+  )
+}
+
+function ContextAgnosticParagraph1({ children }) {
   return (
     <Card css={{ $$cardColor: '#111', p: '0 $sm', m: '$md 0' }}>
       <Card.Body>
         <Text css={{ textGradient: '45deg, $purple600 -20%, $pink600 100%' }}>
-          Edit <pre style={{ display: 'inline' }}>src/App.js</pre> and save to
-          reload. NextUI gives you the best developer experience with all the
-          features you need for building beautiful and modern websites and
-          applications.
+          The code for this implementation could look like this"
+        </Text>
+        <Text
+          as="code"
+          css={{ bg: '#0c0c0c', color: '$success', p: '$xs', m: '$sm 0' }}
+        >
+          {`function App() {
+  const state = useChangingState()
+  return (
+    <AppContext.Provider value={state}>
+      ...
+    </AppContext.Provider>
+}`}
+        </Text>
+        {children}
+      </Card.Body>
+    </Card>
+  )
+}
+
+function ContextAgnosticParagraph2({ children }) {
+  return (
+    <Card css={{ $$cardColor: '#111', p: '0 $sm', m: '$md 0' }}>
+      <Card.Body>
+        <Text css={{ textGradient: '45deg, $purple600 -20%, $pink600 100%' }}>
+          The code for this implementation could look like this"
+        </Text>
+        <Text
+          as="code"
+          css={{ bg: '#0c0c0c', color: '$success', p: '$xs', m: '$sm 0' }}
+        >
+          {`function App() {
+  return (
+    <AppContextProvider>
+      ...
+    </AppContextProvider>
+}`}
         </Text>
         <Spacer />
         {children}
@@ -81,27 +122,25 @@ function ContextAgnosticLink() {
       >
         Learn React
       </Link>
-      <Spacer />
     </>
   )
 }
 
 function AppWithInternalStateAndDirectContextProviderCall() {
-  const state = useInitialState()
+  const state = useChangingState()
   return (
     <AppContext.Provider value={state}>
       <Container xs>
         <Text h2 css={{ textGradient: '45deg, $red600 -20%, $pink600 50%' }}>
           App with internal state passed to directly called AppContext.Provider:
         </Text>
-        <ContextAgnosticParagraph>
+        <ContextAgnosticParagraph1>
           <ContextAgnosticLink />
           <ContextConsumerTitle />
-        </ContextAgnosticParagraph>
-        <ContextAgnosticParagraph>
-          <ContextAgnosticLink />
+        </ContextAgnosticParagraph1>
+        <ContextAgnosticCard>
           <ContextConsumerButton />
-        </ContextAgnosticParagraph>
+        </ContextAgnosticCard>
       </Container>
     </AppContext.Provider>
   )
@@ -114,14 +153,13 @@ function AppWithStateInsideContextProvider() {
         <Text h2 css={{ textGradient: '45deg, $red600 -20%, $pink600 50%' }}>
           App with separate ContextProvider and state encapsulated inside:
         </Text>
-        <ContextAgnosticParagraph>
+        <ContextAgnosticParagraph2>
           <ContextAgnosticLink />
           <ContextConsumerTitle />
-        </ContextAgnosticParagraph>
-        <ContextAgnosticParagraph>
-          <ContextAgnosticLink />
+        </ContextAgnosticParagraph2>
+        <ContextAgnosticCard>
           <ContextConsumerButton />
-        </ContextAgnosticParagraph>
+        </ContextAgnosticCard>
       </Container>
     </AppContextProvider>
   )
